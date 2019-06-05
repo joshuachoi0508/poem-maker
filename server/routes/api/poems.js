@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Get poems
 router.get('/', async (req, res) => {
-  const poems = await loadPostsCollection();
+  const poems = await loadPoemssCollection();
   res.send(await poems.find({}).toArray());
 })
 
@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
 
 // Delete poem
 
-async function loadPostsCollection() {
+async function loadPoemssCollection() {
   const client = await mongodb.MongoClient.connect('mongodb://poem_creator:poem_creator123@ds133137.mlab.com:33137/poem_creator', {
     useNewUrlParser: true
   });
