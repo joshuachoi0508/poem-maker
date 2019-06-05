@@ -4,14 +4,14 @@ const cors = require('cors');
 
 const app = express();
 
-//Middleware
-app.use(bodyParser.json);
+// Middleware
+app.use(bodyParser.json());
 app.use(cors());
 
-const posts = require('./routes/api/posts');
+const poems = require('./routes/api/poems');
 
-app.use('/api/posts', posts)
+app.use('/api/poems', poems);
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5000;
 
 app.listen(port, () => console.log(`Server started on port ${port}`));
