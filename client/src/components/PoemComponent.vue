@@ -194,10 +194,14 @@ export default {
       await PoemService.deletePoem(id);
       this.poems = await PoemService.getPoems();
     },
-    handleSubmit(type){
+    async editPoem(id) {
+      await PoemService.editPoem(id, this.text);
+      this.poems = await PoemService.getPoems();
+    },
+    handleSubmit(type, id) {
       this.errors = [];
 
-      if (this.checkLength() && this.checkChars() && type === 'POST') {
+      if (this.checkLength("POST") && this.checkChars("POST") && type === 'POST') {
         const firstFirstWord = this.prepositions[1][0].toUpperCase() + this.prepositions[1].slice(1).toLowerCase();
         const secondFirstWord = this.prepositions[2][0].toUpperCase() + this.prepositions[2].slice(1).toLowerCase();
         const thirdFirstWord = this.prepositions[0][0].toUpperCase() + this.prepositions[0].slice(1).toLowerCase();
@@ -216,81 +220,170 @@ export default {
 
         this.createPoem();
       }
+
+      if (this.checkLength("PUT") && this.checkChars("PUT") && type === 'PUT') {
+        const firstFirstWord = this.editPrepositions[1][0].toUpperCase() + this.editPrepositions[1].slice(1).toLowerCase();
+        const secondFirstWord = this.editPrepositions[2][0].toUpperCase() + this.editPrepositions[2].slice(1).toLowerCase();
+        const thirdFirstWord = this.editPrepositions[0][0].toUpperCase() + this.editPrepositions[0].slice(1).toLowerCase();
+        const title = this.editNouns[2][0].toUpperCase() + this.editNouns[2].slice(1);
+
+        this.text = `${title}.`
+        + `${firstFirstWord} ${this.editAdjectives[0].toLowerCase()} ${this.editNouns[2].toLowerCase()} ${this.editAdverbs[2].toLowerCase()} ${this.editVerbs[1]}.`
+        + `${secondFirstWord} ${this.editAdjectives[2].toLowerCase()} ${this.editNouns[0].toLowerCase()} ${this.editAdverbs[1].toLowerCase()} ${this.editVerbs[2].toLowerCase()}.`
+        + `${thirdFirstWord} ${this.editAdjectives[1].toLowerCase()} ${this.editNouns[1].toLowerCase()} ${this.editAdverbs[0].toLowerCase()} ${this.editVerbs[0].toLowerCase()}.`;
+
+        this.editNouns = [];
+        this.editAdjectives = [];
+        this.editAdverbs = [];
+        this.editPrepositions = [];
+        this.editVerbs = [];
+
+        this.editPoem(id);
+      }
     },
-    checkLength() {
-      if (!(this.nouns.length === 3 && this.adjectives.length === 3 &&
+    checkLength(type) {
+      if (type === "POST" && !(this.nouns.length === 3 && this.adjectives.length === 3 &&
       this.adverbs.length === 3 && this.prepositions.length === 3 &&
-      this.verbs.length === 3
-      )) {
+      this.verbs.length === 3)) {
+        this.errors.push('Insert all fields');
+        return false;
+      }
+
+      if (type === "PUT" && !(this.editNouns.length === 3 && this.editAdjectives.length === 3 &&
+      this.editAdverbs.length === 3 && this.editPrepositions.length === 3 &&
+      this.editVerbs.length === 3)) {
         this.errors.push('Insert all fields');
         return false;
       }
 
       return true;
     },
-    checkChars() {
+    checkChars(type) {
       const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split('')
 
-      for(let i = 0; i < this.nouns.length; i++) {
-        const noun = this.nouns[i];
-        if (noun === undefined) return false;
-
-        for(let j = 0; j < noun.length; j++) {
-          if (!alphabet.includes(noun[j])) {
-            this.errors.push('Only insert English characters without any space');
-            return false;
+      if (type === "POST") {
+        for(let i = 0; i < this.nouns.length; i++) {
+          const noun = this.nouns[i];
+          if (noun === undefined) return false;
+  
+          for(let j = 0; j < noun.length; j++) {
+            if (!alphabet.includes(noun[j])) {
+              this.errors.push('Only insert English characters without any space');
+              return false;
+            }
+          }
+        }
+  
+        for(let i = 0; i < this.adjectives.length; i++) {
+          const adjective = this.adjectives[i];
+          if (adjective === undefined) return false;
+  
+          for(let j = 0; j < adjective.length; j++) {
+            if (!alphabet.includes(adjective[j])) {
+              this.errors.push('Insert only English characters');
+              return false;
+            }
+          }
+        }
+  
+        for(let i = 0; i < this.adverbs.length; i++) {
+          const adverb = this.adverbs[i];
+          if (adverb === undefined) return false;
+  
+          for(let j = 0; j < adverb.length; j++) {
+            if (!alphabet.includes(adverb[j])) {
+              this.errors.push('Only insert English characters');
+              return false;
+            }
+          }
+        }
+  
+        for(let i = 0; i < this.prepositions.length; i++) {
+          const preposition = this.prepositions[i];
+          if (preposition === undefined) return false;
+  
+          for(let j = 0; j < preposition.length; j++) {
+            if (!alphabet.includes(preposition[j])) {
+              this.errors.push('Only insert English characters');
+              return false;
+            }
+          }
+        }
+  
+        for(let i = 0; i < this.verbs.length; i++) {
+          const verb = this.verbs[i];
+          if (verb === undefined) return false;
+  
+          for(let j = 0; j < verb.length; j++) {
+            if (!alphabet.includes(verb[j])) {
+              this.errors.push('Only insert English characters');
+              return false;
+            }
           }
         }
       }
 
-      for(let i = 0; i < this.adjectives.length; i++) {
-        const adjective = this.adjectives[i];
-        if (adjective === undefined) return false;
-
-        for(let j = 0; j < adjective.length; j++) {
-          if (!alphabet.includes(adjective[j])) {
-            this.errors.push('Insert only English characters');
-            return false;
+      if (type === "PUT") {
+        for(let i = 0; i < this.editNouns.length; i++) {
+          const noun = this.editNouns[i];
+          if (noun === undefined) return false;
+  
+          for(let j = 0; j < noun.length; j++) {
+            if (!alphabet.includes(noun[j])) {
+              this.errors.push('Only insert English characters without any space');
+              return false;
+            }
+          }
+        }
+  
+        for(let i = 0; i < this.editAdjectives.length; i++) {
+          const adjective = this.editAdjectives[i];
+          if (adjective === undefined) return false;
+  
+          for(let j = 0; j < adjective.length; j++) {
+            if (!alphabet.includes(adjective[j])) {
+              this.errors.push('Insert only English characters');
+              return false;
+            }
+          }
+        }
+  
+        for(let i = 0; i < this.editAdverbs.length; i++) {
+          const adverb = this.editAdverbs[i];
+          if (adverb === undefined) return false;
+  
+          for(let j = 0; j < adverb.length; j++) {
+            if (!alphabet.includes(adverb[j])) {
+              this.errors.push('Only insert English characters');
+              return false;
+            }
+          }
+        }
+  
+        for(let i = 0; i < this.prepositions.length; i++) {
+          const preposition = this.prepositions[i];
+          if (preposition === undefined) return false;
+  
+          for(let j = 0; j < preposition.length; j++) {
+            if (!alphabet.includes(preposition[j])) {
+              this.errors.push('Only insert English characters');
+              return false;
+            }
+          }
+        }
+  
+        for(let i = 0; i < this.verbs.length; i++) {
+          const verb = this.verbs[i];
+          if (verb === undefined) return false;
+  
+          for(let j = 0; j < verb.length; j++) {
+            if (!alphabet.includes(verb[j])) {
+              this.errors.push('Only insert English characters');
+              return false;
+            }
           }
         }
       }
-
-      for(let i = 0; i < this.adverbs.length; i++) {
-        const adverb = this.adverbs[i];
-        if (adverb === undefined) return false;
-
-        for(let j = 0; j < adverb.length; j++) {
-          if (!alphabet.includes(adverb[j])) {
-            this.errors.push('Only insert English characters');
-            return false;
-          }
-        }
-      }
-
-      for(let i = 0; i < this.prepositions.length; i++) {
-        const preposition = this.prepositions[i];
-        if (preposition === undefined) return false;
-
-        for(let j = 0; j < preposition.length; j++) {
-          if (!alphabet.includes(preposition[j])) {
-            this.errors.push('Only insert English characters');
-            return false;
-          }
-        }
-      }
-
-      for(let i = 0; i < this.verbs.length; i++) {
-        const verb = this.verbs[i];
-        if (verb === undefined) return false;
-
-        for(let j = 0; j < verb.length; j++) {
-          if (!alphabet.includes(verb[j])) {
-            this.errors.push('Only insert English characters');
-            return false;
-          }
-        }
-      }
-
       return true;
     },
     organizePoem(poem){
@@ -338,12 +431,6 @@ export default {
       this.editPrepositions.push(words[0], words[5], words[10]);
       this.editVerbs.push(words[4], words[10], words[14]);
     }
-
-    // "Against bright foot seductively 
-    // Swim In large ear plug slowly catch After limited phone quietly lie "
-
-    //"Behind loud club highly 
-    //dance Throughout silent store lowly draw Before quiet cave completely die "
   }
 }
 </script>
