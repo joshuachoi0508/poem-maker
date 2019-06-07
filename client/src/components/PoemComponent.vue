@@ -4,7 +4,7 @@
     <div class="create-poem">
       <form 
         class="create-poem-form"
-        @submit.prevent="handleSubmit"
+        @submit.prevent="handleSubmit('POST')"
       >
         <div class="user-inputs">
           <label class="user-input-label">
@@ -93,7 +93,7 @@
           <div v-if="editPoemId === poem._id">
             <form 
               class="create-poem-form"
-              @submit.prevent="handleSubmit"
+              @submit.prevent="handleSubmit('PUT')"
             >
               <div class="user-inputs">
                 <label class="user-input-label">
@@ -194,11 +194,10 @@ export default {
       await PoemService.deletePoem(id);
       this.poems = await PoemService.getPoems();
     },
-    handleSubmit(e){
-      e.preventDefault;
+    handleSubmit(type){
       this.errors = [];
 
-      if (this.checkLength() && this.checkChars()) {
+      if (this.checkLength() && this.checkChars() && type === 'POST') {
         const firstFirstWord = this.prepositions[1][0].toUpperCase() + this.prepositions[1].slice(1).toLowerCase();
         const secondFirstWord = this.prepositions[2][0].toUpperCase() + this.prepositions[2].slice(1).toLowerCase();
         const thirdFirstWord = this.prepositions[0][0].toUpperCase() + this.prepositions[0].slice(1).toLowerCase();
