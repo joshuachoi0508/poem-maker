@@ -93,7 +93,7 @@
           <div v-if="editPoemId === poem._id">
             <form 
               class="create-poem-form"
-              @submit.prevent="handleSubmit('PUT')"
+              @submit.prevent="handleSubmit('PUT', poem._id)"
             >
               <div class="user-inputs">
                 <label class="user-input-label">
@@ -132,10 +132,10 @@
                 </label>
               </div>
 
-              <p v-if="errors.length">
+              <p v-if="editErrors.length">
                 <ul class="error-list">
                   <li class="error"
-                    v-for="error in errors"
+                    v-for="error in editErrors"
                     v-bind:item="error"
                     v-bind:key="error"
                   >{{ error }}</li>
@@ -170,6 +170,7 @@ export default {
       editVerbs: [],
       error: '',
       errors: [],
+      editErrors: [],
       text: '',
       nouns: [],
       adjectives: [],
@@ -200,15 +201,16 @@ export default {
     },
     handleSubmit(type, id) {
       this.errors = [];
+      this.editErrors = [];
 
-      if (this.checkLength("POST") && this.checkChars("POST") && type === 'POST') {
+      if (type === "POST" && this.checkLength("POST") && this.checkChars("POST")) {
         const firstFirstWord = this.prepositions[1][0].toUpperCase() + this.prepositions[1].slice(1).toLowerCase();
         const secondFirstWord = this.prepositions[2][0].toUpperCase() + this.prepositions[2].slice(1).toLowerCase();
         const thirdFirstWord = this.prepositions[0][0].toUpperCase() + this.prepositions[0].slice(1).toLowerCase();
         const title = this.nouns[2][0].toUpperCase() + this.nouns[2].slice(1);
 
         this.text = `${title}.`
-        + `${firstFirstWord} ${this.adjectives[0].toLowerCase()} ${this.nouns[2].toLowerCase()} ${this.adverbs[2].toLowerCase()} ${this.verbs[1]}.`
+        + `${firstFirstWord} ${this.adjectives[0].toLowerCase()} ${this.nouns[2].toLowerCase()} ${this.adverbs[2].toLowerCase()} ${this.verbs[1].toLowerCase()}.`
         + `${secondFirstWord} ${this.adjectives[2].toLowerCase()} ${this.nouns[0].toLowerCase()} ${this.adverbs[1].toLowerCase()} ${this.verbs[2].toLowerCase()}.`
         + `${thirdFirstWord} ${this.adjectives[1].toLowerCase()} ${this.nouns[1].toLowerCase()} ${this.adverbs[0].toLowerCase()} ${this.verbs[0].toLowerCase()}.`;
 
@@ -221,23 +223,23 @@ export default {
         this.createPoem();
       }
 
-      if (this.checkLength("PUT") && this.checkChars("PUT") && type === 'PUT') {
-        const firstFirstWord = this.editPrepositions[1][0].toUpperCase() + this.editPrepositions[1].slice(1).toLowerCase();
-        const secondFirstWord = this.editPrepositions[2][0].toUpperCase() + this.editPrepositions[2].slice(1).toLowerCase();
-        const thirdFirstWord = this.editPrepositions[0][0].toUpperCase() + this.editPrepositions[0].slice(1).toLowerCase();
-        const title = this.editNouns[2][0].toUpperCase() + this.editNouns[2].slice(1);
+      if (type === 'PUT' && this.checkLength("PUT") && this.checkChars("PUT")) {
+        const firstFirstWord = this.editPrepositions[0][0].toUpperCase() + this.editPrepositions[0].slice(1).toLowerCase();
+        const secondFirstWord = this.editPrepositions[1][0].toUpperCase() + this.editPrepositions[1].slice(1).toLowerCase();
+        const thirdFirstWord = this.editPrepositions[2][0].toUpperCase() + this.editPrepositions[2].slice(1).toLowerCase();
+        const title = this.editNouns[0][0].toUpperCase() + this.editNouns[0].slice(1);
 
         this.text = `${title}.`
-        + `${firstFirstWord} ${this.editAdjectives[0].toLowerCase()} ${this.editNouns[2].toLowerCase()} ${this.editAdverbs[2].toLowerCase()} ${this.editVerbs[1]}.`
-        + `${secondFirstWord} ${this.editAdjectives[2].toLowerCase()} ${this.editNouns[0].toLowerCase()} ${this.editAdverbs[1].toLowerCase()} ${this.editVerbs[2].toLowerCase()}.`
-        + `${thirdFirstWord} ${this.editAdjectives[1].toLowerCase()} ${this.editNouns[1].toLowerCase()} ${this.editAdverbs[0].toLowerCase()} ${this.editVerbs[0].toLowerCase()}.`;
-
+        + `${firstFirstWord} ${this.editAdjectives[0].toLowerCase()} ${this.editNouns[0].toLowerCase()} ${this.editAdverbs[0].toLowerCase()} ${this.editVerbs[0].toLowerCase()}.`
+        + `${secondFirstWord} ${this.editAdjectives[1].toLowerCase()} ${this.editNouns[1].toLowerCase()} ${this.editAdverbs[1].toLowerCase()} ${this.editVerbs[1].toLowerCase()}.`
+        + `${thirdFirstWord} ${this.editAdjectives[2].toLowerCase()} ${this.editNouns[2].toLowerCase()} ${this.editAdverbs[2].toLowerCase()} ${this.editVerbs[2].toLowerCase()}.`;
+  
         this.editNouns = [];
         this.editAdjectives = [];
         this.editAdverbs = [];
         this.editPrepositions = [];
         this.editVerbs = [];
-
+        this.editPoemId = "";
         this.editPoem(id);
       }
     },
@@ -249,13 +251,48 @@ export default {
         return false;
       }
 
-      if (type === "PUT" && !(this.editNouns.length === 3 && this.editAdjectives.length === 3 &&
-      this.editAdverbs.length === 3 && this.editPrepositions.length === 3 &&
-      this.editVerbs.length === 3)) {
-        this.errors.push('Insert all fields');
-        return false;
-      }
+      if (type === "PUT") {
+        for(let i = 0; i < this.editNouns.length; i++) {
+          const noun = this.editNouns[i];
+          if (noun === "") {
+            this.editErrors.push('Insert all fields');
+            return false;
+          }
 
+        }
+
+        for(let i = 0; i < this.editAdjectives.length; i++) {
+          const adjective = this.editAdjectives[i];
+          if (adjective === "") {
+            this.editErrors.push('Insert all fields')
+            return false;
+          }
+        }
+
+        for(let i = 0; i < this.editAdverbs.length; i++) {
+          const adverb = this.editAdverbs[i];
+          if (adverb === "") {
+            this.editErrors.push('Insert all fields')
+            return false;
+          }
+        }
+
+        for(let i = 0; i < this.editPrepositions.length; i++) {
+          const preposition = this.editPrepositions[i];
+          if (preposition === "") {
+            this.editErrors.push('Insert all fields')
+           return false;
+          }
+        }
+
+        for(let i = 0; i < this.editVerbs.length; i++) {
+          const Verb = this.editVerbs[i];
+          if (Verb === "") {
+            this.editErrors.push('Insert all fields')
+            return false;
+          }
+        }
+      }
       return true;
     },
     checkChars(type) {
@@ -330,7 +367,7 @@ export default {
   
           for(let j = 0; j < noun.length; j++) {
             if (!alphabet.includes(noun[j])) {
-              this.errors.push('Only insert English characters without any space');
+              this.editErrors.push('Only insert English characters without any space');
               return false;
             }
           }
@@ -342,7 +379,7 @@ export default {
   
           for(let j = 0; j < adjective.length; j++) {
             if (!alphabet.includes(adjective[j])) {
-              this.errors.push('Insert only English characters');
+              this.editErrors.push('Insert only English characters');
               return false;
             }
           }
@@ -354,7 +391,7 @@ export default {
   
           for(let j = 0; j < adverb.length; j++) {
             if (!alphabet.includes(adverb[j])) {
-              this.errors.push('Only insert English characters');
+              this.editErrors.push('Only insert English characters');
               return false;
             }
           }
@@ -366,7 +403,7 @@ export default {
   
           for(let j = 0; j < preposition.length; j++) {
             if (!alphabet.includes(preposition[j])) {
-              this.errors.push('Only insert English characters');
+              this.editErrors.push('Only insert English characters');
               return false;
             }
           }
@@ -378,7 +415,7 @@ export default {
   
           for(let j = 0; j < verb.length; j++) {
             if (!alphabet.includes(verb[j])) {
-              this.errors.push('Only insert English characters');
+              this.editErrors.push('Only insert English characters');
               return false;
             }
           }
