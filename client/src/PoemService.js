@@ -28,6 +28,12 @@ class PoemService {
     });
   }
 
+  static editPoem(id, text) {
+    return axios.put(`${url}${id}`, {
+      text
+    });
+  }
+
   //Delete Poems
   static deletePoem(id) {
     return axios.delete(`${url}${id}`)
