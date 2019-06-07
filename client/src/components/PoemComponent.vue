@@ -466,7 +466,8 @@ export default {
       this.editAdjectives.push(words[1], words[6], words[11]);
       this.editAdverbs.push(words[3], words[8], words[13]);
       this.editPrepositions.push(words[0], words[5], words[10]);
-      this.editVerbs.push(words[4], words[10], words[14]);
+      this.editVerbs.push(words[4], words[9], words[14]);
+      debugger;
     }
   }
 }
