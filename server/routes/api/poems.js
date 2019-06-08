@@ -20,10 +20,20 @@ router.post('/', async(req, res) => {
   res.status(201).send();
 })
 
-// Delete poem
 router.delete('/:id', async(req, res) => {
   const poems = await loadPoemsCollection();
   await poems.deleteMany({_id: new mongodb.ObjectID(req.params.id)});
+  res.status(200).send();
+});
+
+// Delete poem
+router.put('/:id', async(req, res) => {
+  const poems = await loadPoemsCollection();
+  await poems.findOneAndUpdate(
+   {_id: new mongodb.ObjectID(req.params.id)},
+   {$set: { text: req.body.text}},
+  );
+
   res.status(200).send();
 });
 
